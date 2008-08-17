@@ -1,0 +1,3 @@
+#/bin/sh
+
+/usr/src/linux/usr/gen_init_cpio initramfs.spec | gzip > initrd.igz
