@@ -2,29 +2,22 @@
 echo Waiting for USB mass storage
 sleep 7
 
-echo Mounting SD card
-mount -t vfat -o rw,sync /dev/sda1 /mnt/card
-mount -t vfat -o rw,sync /dev/sdb1 /mnt/ext
-
-echo Preparing loopback device
-losetup /dev/loop0 /mnt/card/rootfs
-losetup /dev/loop0 /mnt/ext/rootfs
-
-umount /mnt/card /mnt/ext
-
-echo Mounting root filesystem
-mount -t ext2 -o rw /dev/loop0 /newroot
-
-echo Switching root to the loopback device
-exec switch_root /newroot /linuxrc
-echo Failed
-
 echo Trying to mount / on sdb2
 umount /newroot
-mount -t ext2 -o rw /dev/sdb2 /newroot
+mount -t ext2 -o rw /dev/sdb2 /newroot && exec switch_root /newroot /linuxrc
 
-echo Switching root to sdb2
-exec switch_root /newroot /linuxrc
-echo 
+echo Trying to mount internal/rootfs
+mount -t vfat -o rw,sync /dev/sdb1 /mnt/ext
+losetup /dev/loop0 /mnt/ext/rootfs
+mount -t ext2 -o rw /dev/loop0 /newroot && exec switch_root /newroot /linuxrc
+losetup -d /dev/loop0
+umount /mnt/ext
 
-echo Failed. Have a nice day.
+echo Trying to mount card/rootfs
+mount -t vfat -o rw,sync /dev/sda1 /mnt/card
+losetup /dev/loop0 /mnt/card/rootfs
+mount -t ext2 -o rw /dev/loop0 /newroot && exec switch_root /newroot /linuxrc
+losetup -d /dev/loop0
+umount /mnt/card
+
+echo Failed.
