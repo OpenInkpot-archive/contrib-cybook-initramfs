@@ -5,6 +5,7 @@ sleep 7
 echo Trying to mount / on sdb2
 umount /newroot
 mount -t ext2 -o rw /dev/sdb2 /newroot && exec switch_root /newroot /linuxrc
+umount /newroot
 
 echo Trying to mount internal/rootfs
 mount -t vfat -o rw,sync /dev/sdb1 /mnt/ext
